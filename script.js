@@ -1,13 +1,10 @@
 // RSS Feed URLs for Catholic news sources
 const RSS_FEEDS = {
-    vatican: 'https://www.vaticannews.va/en.rss.xml',
     cna: 'https://www.catholicnewsagency.com/rss',
     ncr: 'https://www.ncregister.com/feeds/general-news.xml',
-    ewtn: 'https://www.ewtnnews.com/rss'
+    ewtn: 'https://www.ewtnnews.com/catholic-news/rss.xml',
+    vatican: 'https://www.vaticannews.va/en.rss.xml'
 };
-
-// RSS to JSON API (using a CORS proxy)
-const RSS_TO_JSON_API = 'https://api.rss2json.com/v1/api.json';
 
 let allArticles = [];
 let currentFilter = 'all';
@@ -67,30 +64,40 @@ async function loadAllFeeds() {
     }
 }
 
-// Fetch individual RSS feed
+// Fetch individual RSS feed using AllOrigins CORS proxy
 async function fetchFeed(source, feedUrl) {
     try {
-        const response = await fetch(`${RSS_TO_JSON_API}?rss_url=${encodeURIComponent(feedUrl)}&api_key=public&count=20`);
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
+        const response = await fetch(proxyUrl);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(data.contents, 'text/xml');
 
-        if (data.status === 'ok' && data.items) {
-            const articles = data.items.map(item => ({
-                source: source,
-                sourceName: getSourceName(source),
-                title: item.title,
-                link: item.link,
-                pubDate: item.pubDate,
-                description: stripHtml(item.description || item.content || ''),
-                thumbnail: item.thumbnail || item.enclosure?.link || ''
-            }));
+        // Parse RSS items
+        const items = xml.querySelectorAll('item');
 
-            allArticles.push(...articles);
-        }
+        items.forEach((item, index) => {
+            if (index < 20) { // Limit to 20 articles per feed
+                const title = item.querySelector('title')?.textContent || 'Untitled';
+                const link = item.querySelector('link')?.textContent || '#';
+                const pubDate = item.querySelector('pubDate')?.textContent || new Date().toISOString();
+                const description = item.querySelector('description')?.textContent || '';
+
+                allArticles.push({
+                    source: source,
+                    sourceName: getSourceName(source),
+                    title: title,
+                    link: link,
+                    pubDate: pubDate,
+                    description: stripHtml(description)
+                });
+            }
+        });
     } catch (error) {
         console.error(`Error fetching ${source}:`, error);
     }
@@ -176,7 +183,7 @@ function renderArticles() {
     `).join('');
 }
 
-// Refresh button functionality (optional enhancement)
+// Refresh news
 function refreshNews() {
     loadAllFeeds();
 }
