@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catholic News Aggregator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>✟ Catholic News Aggregator</h1>
+            <p class="subtitle">Latest News from Catholic Sources Around the World</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <button class="source-filter active" data-source="all">All Sources</button>
+            <button class="source-filter" data-source="vatican">Vatican News</button>
+            <button class="source-filter" data-source="cna">Catholic News Agency</button>
+            <button class="source-filter" data-source="ncr">National Catholic Register</button>
+            <button class="source-filter" data-source="ewtn">EWTN News</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading Catholic news from around the world...</p>
+        </div>
+
+        <div id="news-container" class="news-grid"></div>
+
+        <div id="error" class="error" style="display: none;">
+            <p>Unable to load some news sources. Please try again later.</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Catholic News Aggregator | For the Greater Glory of God</p>
+            <p class="sources">Sources: Vatican News, Catholic News Agency, National Catholic Register, EWTN News</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
